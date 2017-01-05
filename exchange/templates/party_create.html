@@ -1,0 +1,7 @@
+<h1> Create your gift exchange party </h1>
+
+<form action="/party/" method="post">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" value="Submit" />
+</form>

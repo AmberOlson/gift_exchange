@@ -1,0 +1,9 @@
+<h1> "hi" </h1>
+{{user.username}}
+<br>
+{{cat}}
+{% for party in parties %}
+  {{ party.name }} <br>
+{% endfor %}
+
+<a href = "{% url 'party_create' %}"> Create a party </a>
