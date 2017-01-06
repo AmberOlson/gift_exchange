@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
-
 from django.db import models
-
+from django.contrib.auth.models import User
 # Create your models here.
 class Party(models.Model):
     status = models.CharField(default='joining', max_length=255)
@@ -9,6 +8,8 @@ class Party(models.Model):
 
 class Participant(models.Model):
     party = models.ForeignKey(Party)
+    admin = models.BooleanField(default=True)
+    user = models.ForeignKey(User, blank=True, null=True)
 
 class Exchange(models.Model):
     party = models.ForeignKey(Party)

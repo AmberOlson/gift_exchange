@@ -1,0 +1,16 @@
+<h1> Hi </h1>
+<h2> Party Name: {{party.name}} </h2>
+<br>
+{{party.status}}
+<a href = "{% url 'party_participant_create' party.id %}"> Invite a persons </a>
+
+<h1> Invite a person </h1>
+
+<form action="{% url 'party_participant_create' party.id %}" method="post">
+    {% csrf_token %}
+    {% for user in users %}
+      <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}" />
+      <label for="choice{{ forloop.counter }}">{{ user.username }}</label><br />
+    {% endfor %}
+    <input type="submit" value="Submit" />
+</form>

@@ -15,11 +15,13 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
-from exchange.views import PartyListView, PartyCreateView
+from exchange.views import PartyListView, PartyCreateView, PartyView, ParticipantCreateView
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url('^', include('django.contrib.auth.urls')),
-    url(r'^parties/', PartyListView.as_view(), name="party_list"),
-    url(r'^party/', PartyCreateView.as_view(), name="party_create"),
+    url(r'^parties/$', PartyListView.as_view(), name="party_list"),
+    url(r'^party/$', PartyCreateView.as_view(), name="party_create"),
+    url(r'^party/(?P<pk>[0-9]+)/view/$', PartyView.as_view(), name='party_view'),
+    url(r'^party/(?P<pk>[0-9]+)/guests/$', ParticipantCreateView.as_view(), name="party_participant_create"),
 ]

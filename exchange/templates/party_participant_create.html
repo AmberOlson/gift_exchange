@@ -1,0 +1,7 @@
+<h1> Invite Guest:</h1>
+
+<form action="{% url 'party_participant_create' party.id %}" method="post">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" value="Submit" />
+</form>

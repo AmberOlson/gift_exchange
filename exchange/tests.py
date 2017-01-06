@@ -44,3 +44,18 @@ class CreatePartyTestCase(TestCase):
         self.assertEqual(302, response.status_code)
         self.assertEquals("%s?next=%s" % (reverse('login'), reverse('party_create')), response.url)
         self.assertFalse(Party.objects.all().exists())
+
+class CreateParticipant(TestCase):
+
+    def test_add_participant(self):
+        User.objects.create_user(username="alex2", email="alex2@example.com", password="password")
+        self.client.login(username="alex2", password="password")
+
+        User.objects.create_user(username="amber", email="amber@example.com", password="password")
+        party = Party.objects.create()
+
+        form_data = {"participant": 1}
+        response = self.client.post(reverse('party_participant_create', kwargs={'pk': 1}), form_data)
+        self.assertEqual(302, response.status_code)
+        self.assertEquals(reverse('party_list'), response.url)
+        self.assertTrue(Participant.objects.get(user=1, party=1, admin="True"))

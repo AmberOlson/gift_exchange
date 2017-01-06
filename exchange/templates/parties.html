@@ -3,7 +3,9 @@
 <br>
 {{cat}}
 {% for party in parties %}
-  {{ party.name }} <br>
+  {{ party.name }}
+  <a href = "{% url 'party_view' party.id %}"> View Party </a>
+   <br>
 {% endfor %}
 
 <a href = "{% url 'party_create' %}"> Create a party </a>
