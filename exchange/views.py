@@ -63,7 +63,7 @@ class ParticipantCreateView(LoginRequiredMixin, TemplateView):
         party = get_object_or_404(Party, pk=self.kwargs.get('pk'))
         if context["form"].is_valid():
             print 'yes done'
-            user = User.objects.get(id=context['form'].cleaned_data['participant'])
+            user = User.objects.get(email=context['form'].cleaned_data['participant'])
             Participant.objects.create(user=user, party=party)
             return redirect('party_list')
         return super(ParticipantCreateView, self).render_to_response(context)

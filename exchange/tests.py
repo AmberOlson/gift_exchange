@@ -24,7 +24,7 @@ class ExchangeTestCase(GiftExchangeTestCase):
         start the Exchange
         assert echange were correclty created
         """
-        self.create_and_login_user()
+        # self.create_and_login_user()
         party = Party.objects.create()
         participant1 = Participant.objects.create(party=party)
         participant2 = Participant.objects.create(party=party)
@@ -36,11 +36,12 @@ class ExchangeTestCase(GiftExchangeTestCase):
         self.assertEqual(1, Exchange.objects.filter(receiver=participant2, party=party).count())
 
 
-class CreatePartyTestCase(TestCase):
+class CreatePartyTestCase(GiftExchangeTestCase):
 
     def test_create_party(self):
-        User.objects.create_user(username="alex", email="alex@example.com", password="password")
-        self.client.login(username="alex", password="password")
+        # User.objects.create_user(username="alex", email="alex@example.com", password="password")
+        # self.client.login(username="alex", password="password")
+        self.create_and_login_user()
 
         form_data = {"name": "My Fun Party"}
         response = self.client.post(reverse('party_create'), form_data)
@@ -57,17 +58,18 @@ class CreatePartyTestCase(TestCase):
         self.assertEquals("%s?next=%s" % (reverse('login'), reverse('party_create')), response.url)
         self.assertFalse(Party.objects.all().exists())
 
-class CreateParticipant(TestCase):
+class CreateParticipant(GiftExchangeTestCase):
 
     def setUp(self):
-        self.admin_user = User.objects.create_user(username="alex2", email="alex2@example.com", password="password")
-        self.client.login(username="alex2", password="password")
+        # self.admin_user = User.objects.create_user(username="alex2", email="alex2@example.com", password="password")
+        # self.client.login(username="alex2", password="password")
+        self.create_and_login_user()
 
         self.invited_user = User.objects.create_user(username="amber", email="amber@example.com", password="password")
         self.party = Party.objects.create()
 
     def test_add_participant(self):
-        form_data = {"participant": 2}
+        form_data = {"participant": self.invited_user.email}
         response = self.client.post(reverse('party_participant_create', kwargs={'pk': self.party.id}), form_data)
         self.assertEqual(302, response.status_code)
         self.assertEquals(reverse('party_list'), response.url)
