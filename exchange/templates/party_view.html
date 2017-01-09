@@ -9,6 +9,17 @@
   {{p.user}}<br>
 {% endfor %}
 
+<form action="{% url 'party_exchange' party.id %}" method="post">
+  {% csrf_token %}
+  <input type="submit" value="Submit" />
+</form>
+
+<h2> Exchanges: </h2>
+{% for e in exchanges %}
+  <li> {{e.giver.user}} to {{e.receiver.user}}</li><br>
+{% endfor %}
+
+
 <h1> Invite a person </h1>
 
 <form action="{% url 'party_participant_create' party.id %}" method="post">

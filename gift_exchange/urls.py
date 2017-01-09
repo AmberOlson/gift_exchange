@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
-from exchange.views import PartyListView, PartyCreateView, PartyView, ParticipantCreateView
+from exchange.views import PartyListView, PartyCreateView, PartyView, ParticipantCreateView, ExchangeView
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -24,4 +24,5 @@ urlpatterns = [
     url(r'^party/$', PartyCreateView.as_view(), name="party_create"),
     url(r'^party/(?P<pk>[0-9]+)/view/$', PartyView.as_view(), name='party_view'),
     url(r'^party/(?P<pk>[0-9]+)/guests/$', ParticipantCreateView.as_view(), name="party_participant_create"),
+    url(r'^party/(?P<pk>[0-9]+)/exchange/$', ExchangeView.as_view(), name="party_exchange"),
 ]
