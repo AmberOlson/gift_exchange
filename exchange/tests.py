@@ -5,7 +5,18 @@ from exchange.models import Party, Exchange, Participant
 from exchange.domain import start_exchange
 
 
-class ExchangeTestCase(TestCase):
+class GiftExchangeTestCase(TestCase):
+
+    def create_and_login_user(self):
+        self.admin_user = User.objects.create_user(username="alex2", email="alex2@example.com", password="password")
+        self.client.login(username="alex2", password="password")
+
+
+class ExchangeTestCase(GiftExchangeTestCase):
+
+    def setUp(self):
+        self.create_and_login_user()
+
     def test_start_exchange(self):
         """
         set up a party,
@@ -13,6 +24,7 @@ class ExchangeTestCase(TestCase):
         start the Exchange
         assert echange were correclty created
         """
+        self.create_and_login_user()
         party = Party.objects.create()
         participant1 = Participant.objects.create(party=party)
         participant2 = Participant.objects.create(party=party)
@@ -47,15 +59,16 @@ class CreatePartyTestCase(TestCase):
 
 class CreateParticipant(TestCase):
 
-    def test_add_participant(self):
-        User.objects.create_user(username="alex2", email="alex2@example.com", password="password")
+    def setUp(self):
+        self.admin_user = User.objects.create_user(username="alex2", email="alex2@example.com", password="password")
         self.client.login(username="alex2", password="password")
 
-        User.objects.create_user(username="amber", email="amber@example.com", password="password")
-        party = Party.objects.create()
+        self.invited_user = User.objects.create_user(username="amber", email="amber@example.com", password="password")
+        self.party = Party.objects.create()
 
-        form_data = {"participant": 1}
-        response = self.client.post(reverse('party_participant_create', kwargs={'pk': 1}), form_data)
+    def test_add_participant(self):
+        form_data = {"participant": 2}
+        response = self.client.post(reverse('party_participant_create', kwargs={'pk': self.party.id}), form_data)
         self.assertEqual(302, response.status_code)
         self.assertEquals(reverse('party_list'), response.url)
-        self.assertTrue(Participant.objects.get(user=1, party=1, admin="True"))
+        self.assertTrue(Participant.objects.get(user=self.invited_user.id, party=1, admin="True"))

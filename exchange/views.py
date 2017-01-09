@@ -20,15 +20,15 @@ class PartyListView(LoginRequiredMixin, TemplateView):
 
 
 class PartyView(LoginRequiredMixin, TemplateView):
-        login_url = '/login/'
-        template_name = "party_view.html"
+    login_url = '/login/'
+    template_name = "party_view.html"
 
+    def get_context_data(self, **kwargs):
+        users = User.objects.all()
+        party = get_object_or_404(Party, pk=self.kwargs.get('pk'))
+        context = {'party': party, 'users': users}
+        return context
 
-        def get_context_data(self, **kwargs):
-            users = User.objects.all()
-            party = get_object_or_404(Party, pk=self.kwargs.get('pk'))
-            context = {'party': party, 'users': users}
-            return context
 
 class PartyCreateView(LoginRequiredMixin, TemplateView):
     login_url = '/login/'
@@ -66,4 +66,4 @@ class ParticipantCreateView(LoginRequiredMixin, TemplateView):
             user = User.objects.get(id=context['form'].cleaned_data['participant'])
             Participant.objects.create(user=user, party=party)
             return redirect('party_list')
-        return super(TemplateView, self).render_to_response(context)
+        return super(ParticipantCreateView, self).render_to_response(context)

@@ -8,8 +8,11 @@ class Party(models.Model):
 
 class Participant(models.Model):
     party = models.ForeignKey(Party)
-    admin = models.BooleanField(default=True)
+    admin = models.BooleanField(default=False)
     user = models.ForeignKey(User, blank=True, null=True)
+
+    class Meta:
+        unique_together = (("party", "user"),)
 
 class Exchange(models.Model):
     party = models.ForeignKey(Party)
