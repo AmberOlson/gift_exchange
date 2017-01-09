@@ -73,4 +73,4 @@ class CreateParticipant(GiftExchangeTestCase):
         response = self.client.post(reverse('party_participant_create', kwargs={'pk': self.party.id}), form_data)
         self.assertEqual(302, response.status_code)
         self.assertEquals(reverse('party_list'), response.url)
-        self.assertTrue(Participant.objects.get(user=self.invited_user.id, party=1, admin="True"))
+        self.assertTrue(Participant.objects.get(user=self.invited_user.id, party=1, admin="False"))

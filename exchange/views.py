@@ -25,8 +25,9 @@ class PartyView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         users = User.objects.all()
+        participants = Participant.objects.filter(party=self.kwargs.get('pk'))
         party = get_object_or_404(Party, pk=self.kwargs.get('pk'))
-        context = {'party': party, 'users': users}
+        context = {'party': party, 'users': users, 'participants': participants}
         return context
 
 

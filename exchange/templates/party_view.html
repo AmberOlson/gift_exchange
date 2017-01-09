@@ -4,6 +4,11 @@
 {{party.status}}
 <a href = "{% url 'party_participant_create' party.id %}"> Invite a persons </a>
 
+<h2> People Parcipating: </h2>
+{% for p in participants %}
+  {{p.user}}<br>
+{% endfor %}
+
 <h1> Invite a person </h1>
 
 <form action="{% url 'party_participant_create' party.id %}" method="post">
