@@ -3,12 +3,34 @@ from django.views import View
 from django.http import HttpResponse
 from django.views.generic import TemplateView
 from django.shortcuts import redirect
-from exchange.forms import PartyCreateForm, ParticipantCreateForm
+from exchange.forms import PartyCreateForm, ParticipantCreateForm, SignUpForm
 from exchange.models import Party, Participant, Exchange
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login
 from exchange.domain import start_exchange
+
+class SignUpView(TemplateView):
+        login_url = '/login/'
+        template_name = "signup.html"
+
+        def get_context_data(self):
+            form = SignUpForm(self.request.POST or None)  # instance= None
+            context = {'form': form}
+            return context
+
+        def post(self, request):
+            context = self.get_context_data()
+            if context["form"].is_valid():
+                User.objects.create_user(username=context['form'].cleaned_data['username'], email=context['form'].cleaned_data['email'], password=context['form'].cleaned_data['password'])
+                username = request.POST['username']
+                password = request.POST['password']
+                user = authenticate(username=username, password=password)
+                if user is not None:
+                    login(request, user)
+                return redirect('party_list')
+            return super(TemplateView, self).render_to_response(context)
 
 
 class PartyListView(LoginRequiredMixin, TemplateView):

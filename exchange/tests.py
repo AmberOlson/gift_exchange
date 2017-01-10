@@ -73,4 +73,14 @@ class CreateParticipant(GiftExchangeTestCase):
         response = self.client.post(reverse('party_participant_create', kwargs={'pk': self.party.id}), form_data)
         self.assertEqual(302, response.status_code)
         self.assertEquals(reverse('party_list'), response.url)
-        self.assertTrue(Participant.objects.get(user=self.invited_user.id, party=1, admin="False"))
+        self.assertTrue(Participant.objects.get(user=self.invited_user.id, party=self.party.id, admin="False"))
+
+class signup(GiftExchangeTestCase):
+
+    def test_sign_up(self):
+        form_data = {"username": "Amber", "email": "amberolson@gmail.com", "password": "password"}
+        response = self.client.post(reverse('signup'), form_data)
+
+        self.assertEqual(302, response.status_code)
+        self.assertEquals(reverse('party_list'), response.url)
+        self.assertTrue(User.objects.get(username="Amber", email="amberolson@gmail.com"))
