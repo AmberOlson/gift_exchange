@@ -53,6 +53,9 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'gift_exchange.urls'
 
+EMAIL_HOST = 'localhost'
+EMAIL_PORT = 1025
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',

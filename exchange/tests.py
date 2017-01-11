@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import reverse
 from exchange.models import Party, Exchange, Participant
 from exchange.domain import start_exchange
+from django.core import mail
 
 
 class GiftExchangeTestCase(TestCase):
@@ -74,6 +75,15 @@ class CreateParticipant(GiftExchangeTestCase):
         self.assertEqual(302, response.status_code)
         self.assertEquals(reverse('party_list'), response.url)
         self.assertTrue(Participant.objects.get(user=self.invited_user.id, party=self.party.id, admin="False"))
+
+    def test_add_a_non_user(self):
+        form_data = {"participant": "notuser@example.com"}
+        response = self.client.post(reverse('party_participant_create', kwargs={'pk': self.party.id}), form_data)
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].subject, 'HI')
+        self.assertEquals(reverse('party_list'), response.url)
+
 
 class signup(GiftExchangeTestCase):
 

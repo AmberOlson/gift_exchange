@@ -10,6 +10,8 @@ from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from exchange.domain import start_exchange
+from exchange.mail import sendmail
+
 
 class SignUpView(TemplateView):
         login_url = '/login/'
@@ -87,9 +89,14 @@ class ParticipantCreateView(LoginRequiredMixin, TemplateView):
         context = self.get_context_data()
         party = get_object_or_404(Party, pk=self.kwargs.get('pk'))
         if context["form"].is_valid():
-            print 'yes done'
-            user = User.objects.get(email=context['form'].cleaned_data['participant'])
-            Participant.objects.create(user=user, party=party)
+            try:
+                user = User.objects.get(email=context['form'].cleaned_data['participant'])
+                Participant.objects.create(user=user, party=party)
+                return redirect('party_list')
+            except User.DoesNotExist:
+                pass
+
+            sendmail(context['form'].cleaned_data['participant'])
             return redirect('party_list')
         return super(ParticipantCreateView, self).render_to_response(context)
 
