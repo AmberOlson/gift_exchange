@@ -13,26 +13,54 @@ from exchange.domain import start_exchange
 from exchange.mail import sendmail
 
 
+class SignUpInvitedView(TemplateView):
+    login_url = '/login/'
+    template_name = "signup_invited.html"
+
+    def get_context_data(self, **kwargs):
+        form = SignUpForm(self.request.POST or None)  # instance= None
+        participant = Participant.objects.get(id=self.kwargs["pk"])
+        context = {'form': form, 'participant': participant}
+        return context
+
+    def post(self, request,  **kwargs):
+        context = self.get_context_data()
+        if context["form"].is_valid():
+            User.objects.create_user(username=context['form'].cleaned_data['username'], email=context['form'].cleaned_data['email'], password=context['form'].cleaned_data['password'])
+            username = request.POST['username']
+            password = request.POST['password']
+            user = authenticate(username=username, password=password)
+
+            if user is not None:
+                participant = Participant.objects.get(id=self.kwargs["pk"])
+                participant.user_id = user.id
+                participant.save()
+                login(request, user)
+            return redirect('party_list')
+        return super(TemplateView, self).render_to_response(context)
+
+
 class SignUpView(TemplateView):
-        login_url = '/login/'
-        template_name = "signup.html"
+    login_url = '/login/'
+    template_name = "signup.html"
 
-        def get_context_data(self):
-            form = SignUpForm(self.request.POST or None)  # instance= None
-            context = {'form': form}
-            return context
+    def get_context_data(self):
+        form = SignUpForm(self.request.POST or None)  # instance= None
+        context = {'form': form}
+        return context
 
-        def post(self, request):
-            context = self.get_context_data()
-            if context["form"].is_valid():
-                User.objects.create_user(username=context['form'].cleaned_data['username'], email=context['form'].cleaned_data['email'], password=context['form'].cleaned_data['password'])
-                username = request.POST['username']
-                password = request.POST['password']
-                user = authenticate(username=username, password=password)
-                if user is not None:
-                    login(request, user)
-                return redirect('party_list')
-            return super(TemplateView, self).render_to_response(context)
+    def post(self, request):
+        context = self.get_context_data()
+        if context["form"].is_valid():
+            User.objects.create_user(username=context['form'].cleaned_data['username'], email=context['form'].cleaned_data['email'], password=context['form'].cleaned_data['password'])
+            username = request.POST['username']
+            password = request.POST['password']
+            user = authenticate(username=username, password=password)
+
+            if user is not None:
+                login(request, user)
+            return redirect('party_list')
+        return super(TemplateView, self).render_to_response(context)
 
 
 class PartyListView(LoginRequiredMixin, TemplateView):
@@ -96,7 +124,8 @@ class ParticipantCreateView(LoginRequiredMixin, TemplateView):
             except User.DoesNotExist:
                 pass
 
-            sendmail(context['form'].cleaned_data['participant'])
+            participant = Participant.objects.create(party=party)
+            sendmail(context['form'].cleaned_data['participant'], participant)
             return redirect('party_list')
         return super(ParticipantCreateView, self).render_to_response(context)
 

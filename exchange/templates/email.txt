@@ -1,0 +1,4 @@
+<h1>WOW signup</h1>
+<p> Just click here to {{link}}
+<a href = "{% url 'signup_invited' participant.id%}">  Sign UP</a>
+</p>

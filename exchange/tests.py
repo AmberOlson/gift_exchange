@@ -81,9 +81,20 @@ class CreateParticipant(GiftExchangeTestCase):
         response = self.client.post(reverse('party_participant_create', kwargs={'pk': self.party.id}), form_data)
         self.assertEqual(302, response.status_code)
         self.assertEqual(len(mail.outbox), 1)
+        #somehow confirm that the user id is null?
+        self.assertTrue(Participant.objects.get(party=self.party.id, admin="False"))
         self.assertEqual(mail.outbox[0].subject, 'HI')
+        self.assertEqual(mail.outbox[0].to, ["notuser@example.com"])
+        self.assertIn('www.localhost//signup/invited/1', mail.outbox[0].body)
+        # a line in the shows what link is sent in the email
         self.assertEquals(reverse('party_list'), response.url)
-
+        self.client.logout()
+        participant = Participant.objects.last()
+        form_data = {"username": "Candy", "email": "candy@example.com", "password": "password"}
+        response = self.client.post(reverse('signup_invited', kwargs={'pk': participant.id}), form_data)
+        self.assertEqual(302, response.status_code)
+        user = User.objects.get(username= "Candy")
+        self.assertTrue(Participant.objects.get(user=user.id, party=self.party.id, admin=False))
 
 class signup(GiftExchangeTestCase):
 
