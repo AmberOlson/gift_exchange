@@ -59,6 +59,25 @@ class CreatePartyTestCase(GiftExchangeTestCase):
         self.assertEquals("%s?next=%s" % (reverse('login'), reverse('party_create')), response.url)
         self.assertFalse(Party.objects.all().exists())
 
+class EditPartyTestCase(GiftExchangeTestCase):
+    def setUp(self):
+        self.create_and_login_user()
+        self.party = Party.objects.create(name="My Fun Party")
+
+    def test_edit_party(self):
+        form_data = {"name": "New Party Name"}
+        response = self.client.post(reverse('party_view', kwargs={'pk': self.party.id}), form_data)
+
+        self.assertEqual(302, response.status_code)
+        self.assertEquals(reverse('party_list'), response.url)
+        self.assertTrue(Party.objects.get(name="New Party Name"))
+        self.assertFalse(Party.objects.filter(name="My Fun Party"))
+
+    def test_delete(self):
+        response = self.client.post(reverse('party_delete', kwargs={'pk': self.party.id}))
+        self.assertFalse(Party.objects.filter(name="My Fun Party"))
+
+
 class CreateParticipant(GiftExchangeTestCase):
 
     def setUp(self):

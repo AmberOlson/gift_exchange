@@ -3,7 +3,7 @@ from django.views import View
 from django.http import HttpResponse
 from django.views.generic import TemplateView
 from django.shortcuts import redirect
-from exchange.forms import PartyCreateForm, ParticipantCreateForm, SignUpForm
+from exchange.forms import PartyCreateForm, ParticipantCreateForm, SignUpForm, UpDateParty
 from exchange.models import Party, Participant, Exchange
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, render
@@ -53,9 +53,33 @@ class PartyView(LoginRequiredMixin, TemplateView):
         participants = Participant.objects.filter(party=self.kwargs.get('pk'))
         exchanges = Exchange.objects.filter(party=self.kwargs.get('pk'))
         party = get_object_or_404(Party, pk=self.kwargs.get('pk'))
-        context = {'party': party, 'users': users, 'participants': participants, 'exchanges': exchanges}
+        form = UpDateParty(self.request.POST or None, instance=party)
+        context = {'party': party, 'users': users, 'participants': participants, 'exchanges': exchanges, 'form': form}
         return context
 
+    def post(self, request, **kwargs):
+        # instance = Party.objects.get(id=self.kwargs.get('pk'))
+        # form = UpDateParty(request.POST or None, instance=instance)
+        context = self.get_context_data()
+        if context["form"].is_valid():
+            context["form"].save()
+            return redirect('party_list')
+        return direct_to_template(request, 'my_template.html', {'form': form})
+
+
+class PartyDelete(LoginRequiredMixin, TemplateView):
+    login_url = '/login/'
+    template_name = "party_delete.html"
+
+    def get_context_data(self,  **kwargs):
+        party = get_object_or_404(Party, pk=self.kwargs.get('pk'))
+        context = {'party': party}
+        return context
+
+    def post(self, request,  **kwargs):
+        party = get_object_or_404(Party, pk=self.kwargs.get('pk')).delete()
+        return redirect('party_list')
+        # party.delete()
 
 class PartyCreateView(LoginRequiredMixin, TemplateView):
     login_url = '/login/'

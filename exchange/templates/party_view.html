@@ -3,6 +3,8 @@
 <br>
 {{party.status}}
 <a href = "{% url 'party_participant_create' party.id %}"> Invite a persons </a>
+<a href = "{% url 'party_delete' party.id %}"> Delete </a>
+
 
 <h2> People Parcipating: </h2>
 {% for p in participants %}
@@ -19,6 +21,11 @@
   <li> {{e.giver.user}} to {{e.receiver.user}}</li><br>
 {% endfor %}
 
+<form action="{% url 'party_view' party.id %}" method="post">
+    {% csrf_token %}
+    {{form}}
+    <input type="submit" value="Submit" />
+</form>
 
 <h1> Invite a person </h1>
 
