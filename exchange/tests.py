@@ -50,6 +50,7 @@ class CreatePartyTestCase(GiftExchangeTestCase):
         self.assertEqual(302, response.status_code)
         self.assertEquals(reverse('party_list'), response.url)
         self.assertTrue(Party.objects.get(name="My Fun Party"))
+        self.assertTrue(Participant.objects.get(user=self.admin_user))
 
     def test_create_party__login_required__user_not_logged_in(self):
         form_data = {"name": "My Fun Party"}
@@ -103,6 +104,11 @@ class CreateParticipant(GiftExchangeTestCase):
         self.assertEqual(mail.outbox[0].subject, 'HI')
         self.assertEquals(reverse('party_list'), response.url)
 
+    # def test_add_same_user(self):
+    #     first = Participant.objects.create(user=self.invited_user, party=self.party)
+    #     second = Participant.objects.create(user=self.invited_user, party=self.party)
+    #     self.assertTrue(Participant.objects.filter(id=first.id))
+    #     self.assertFalse(Participant.objects.filter(id=second.id))
 
 class signup(GiftExchangeTestCase):
 

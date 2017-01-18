@@ -40,7 +40,9 @@ class PartyListView(LoginRequiredMixin, TemplateView):
     template_name = "parties.html"
 
     def get_context_data(self):
-        context = {'cat': 'candy', 'parties': Party.objects.all()}
+        # parties = Party.objects.all()
+        parties = Party.objects.filter(participant__user=self.request.user)
+        context = {'cat': 'candy', 'parties': parties}
         return context
 
 
@@ -93,8 +95,8 @@ class PartyCreateView(LoginRequiredMixin, TemplateView):
     def post(self, request, *args, **kwargs):
         context = self.get_context_data()
         if context["form"].is_valid():
-            print 'yes done'
-            Party.objects.create(name=context['form'].cleaned_data['name'])
+            party = Party.objects.create(name=context['form'].cleaned_data['name'])
+            Participant.objects.create(party=party, user=request.user)
             return redirect('party_list')
         return super(TemplateView, self).render_to_response(context)
 
