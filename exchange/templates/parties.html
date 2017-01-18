@@ -1,11 +1,22 @@
-<h1> "hi" </h1>
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static '/style.css' %}" />
+
+{% include "header.html" %}
 {{user.username}}
 <br>
-{{cat}}
-{% for party in parties %}
-  {{ party.name }}
-  <a href = "{% url 'party_view' party.id %}"> View Party </a>
-   <br>
-{% endfor %}
 
-<a href = "{% url 'party_create' %}"> Create a party </a>
+
+<table style="width:100%">
+  <tr>
+    <th>Party Name</th>
+    <th>Status</th>
+    <th>View</th>
+  </tr>
+  {% for party in parties %}
+    <tr>
+      <td>{{ party.name }}</td>
+      <td>{{ party.status }}</td>
+      <td><a href = "{% url 'party_view' party.id %}"> View Party </a></td>
+    </tr>
+    {% endfor %}
+</table>
