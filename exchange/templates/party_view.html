@@ -6,27 +6,36 @@
 
 <h2> Party Name: {{party.name}} </h2>
 <br>
-{{party.status}}
-<a href = "{% url 'party_participant_create' party.id %}"> Invite a persons </a>
-<a href = "{% url 'party_delete' party.id %}"> Delete </a>
 
 
-<h2> People Parcipating: </h2>
-{% for p in participants %}
-  {{p.user}}<br>
-{% endfor %}
+{% if admin %}
+  <div class ="party_admin_nav">
+    {{party.status}}
+    <a href = "{% url 'party_participant_create' party.id %}"> Invite a persons </a>
+    <a href = "{% url 'party_delete' party.id %}"> Delete </a>
+    {% if not exchanges %}
+      <form action="{% url 'party_exchange' party.id %}" method="post">
+        {% csrf_token %}
+        <input type="submit" value="Create Exchange" />
+      </form>
+    {% else %}
+      <h2> Exchanges: </h2>
+      {% for e in exchanges %}
+        <li> {{e.giver.user}} to {{e.receiver.user}}</li><br>
+      {% endfor %}
+    {% endif %}
+  </div>
+{% endif %}
 
-
-{% if not exchanges %}
-  <form action="{% url 'party_exchange' party.id %}" method="post">
-    {% csrf_token %}
-    <input type="submit" value="Create Exchange" />
-  </form>
-{% else %}
-  <h2> Exchanges: </h2>
-  {% for e in exchanges %}
-    <li> {{e.giver.user}} to {{e.receiver.user}}</li><br>
+  <h2> People Parcipating: </h2>
+  {% for p in participants %}
+    {{p.user}}<br>
   {% endfor %}
+
+
+{% if your_exchange %}
+  <h1> Your match</h1>
+  {{your_exchange.receiver.user}}
 {% endif %}
 
 <form action="{% url 'party_view' party.id %}" method="post">

@@ -2,7 +2,11 @@ header {
   background-color: #F08080;
 }
 
-/*Party_view.html*/ 
+/*Party_view.html*/
 th {
     text-align: left;
+}
+
+.party_admin_nav {
+  background-color: #F08080;
 }

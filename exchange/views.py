@@ -55,8 +55,27 @@ class PartyView(LoginRequiredMixin, TemplateView):
         participants = Participant.objects.filter(party=self.kwargs.get('pk'))
         exchanges = Exchange.objects.filter(party=self.kwargs.get('pk'))
         party = get_object_or_404(Party, pk=self.kwargs.get('pk'))
+        admin = Participant.objects.filter(party=party, user=self.request.user, admin=True)
+        current_user = Participant.objects.filter(party=party, user=self.request.user)
+        try:
+            your_exchange = Exchange.objects.get(party=party, giver=current_user)
+        except Exchange.DoesNotExist:
+            your_exchange = None
+
         form = UpDateParty(self.request.POST or None, instance=party)
-        context = {'party': party, 'users': users, 'participants': participants, 'exchanges': exchanges, 'form': form}
+        context = {
+            'party': party,
+            'users': users,
+            # 'participants': party.participant_set.all(),
+            # 'exchanges': party.exchange_set.all(),
+            'participants': participants,
+            'exchanges': exchanges,
+            'form': form,
+            # 'current_user': current_user,
+            'your_exchange': your_exchange,
+            'admin': admin
+        }
+        # import pdb; pdb.set_trace()
         return context
 
     def post(self, request, **kwargs):
@@ -96,7 +115,7 @@ class PartyCreateView(LoginRequiredMixin, TemplateView):
         context = self.get_context_data()
         if context["form"].is_valid():
             party = Party.objects.create(name=context['form'].cleaned_data['name'])
-            Participant.objects.create(party=party, user=request.user)
+            Participant.objects.create(party=party, user=request.user, admin=True)
             return redirect('party_list')
         return super(TemplateView, self).render_to_response(context)
 

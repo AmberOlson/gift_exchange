@@ -15,6 +15,6 @@ class Participant(models.Model):
         unique_together = (("party", "user"),)
 
 class Exchange(models.Model):
-    party = models.OneToOneField(Party)
+    party = models.ForeignKey(Party)
     giver = models.ForeignKey(Participant, related_name="giver")
     receiver = models.ForeignKey(Participant, related_name="receiver")
