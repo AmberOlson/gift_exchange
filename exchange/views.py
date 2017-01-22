@@ -145,6 +145,14 @@ class ParticipantCreateView(LoginRequiredMixin, TemplateView):
             return redirect('party_list')
         return super(ParticipantCreateView, self).render_to_response(context)
 
+class ParticipantEditView(LoginRequiredMixin, TemplateView):
+    login_url = '/login/'
+
+    def post(self, request, **kwargs):
+        participant = Participant.objects.get(party=self.kwargs.get('pk'), user=request.user)
+        participant.status = "Joined"
+        participant.save()
+        return redirect('party_list')
 
 class ExchangeView(LoginRequiredMixin, TemplateView):
 

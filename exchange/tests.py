@@ -111,6 +111,21 @@ class CreateParticipant(GiftExchangeTestCase):
     #     self.assertTrue(Participant.objects.filter(id=first.id))
     #     self.assertFalse(Participant.objects.filter(id=second.id))
 
+class ParticipantAccepting(GiftExchangeTestCase):
+
+    def setUp(self):
+        self.create_and_login_user()
+
+    def test_accepting_invite(self):
+        self.invited_user = User.objects.create_user(username="amber", email="amber@example.com", password="password")
+        self.party = Party.objects.create()
+        self.participant = Participant.objects.create(party=self.party, user=self.admin_user)
+        response = self.client.post(reverse('party_participant_edit', kwargs={'pk': self.party.id}))
+        self.assertEqual(302, response.status_code)
+        self.assertEquals(reverse('party_list'), response.url)
+        self.assertTrue(Participant.objects.get(user=self.admin_user, party=self.party, admin="False", status="Joined"))
+
+
 class signup(GiftExchangeTestCase):
 
     def test_sign_up(self):

@@ -25,11 +25,17 @@
       {% endfor %}
     {% endif %}
   </div>
+% else %}
+  <form action="{% url 'party_participant_edit' party.id %}" method="post">
+    {% csrf_token %}
+    <input type="submit" value="Create Exchange" />
+  </form>
 {% endif %}
 
   <h2> People Parcipating: </h2>
   {% for p in participants %}
-    {{p.user}}<br>
+    {{p.user}}
+    {{p.status}}<br>
   {% endfor %}
 
 
