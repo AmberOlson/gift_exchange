@@ -3,7 +3,7 @@ from django.views import View
 from django.http import HttpResponse
 from django.views.generic import TemplateView
 from django.shortcuts import redirect
-from exchange.forms import PartyCreateForm, ParticipantCreateForm, SignUpForm, UpDateParty
+from exchange.forms import PartyCreateForm, ParticipantCreateForm, SignUpForm, UpDateParty, ParticipanJoinForm, ParticipanLeavingForm
 from exchange.models import Party, Participant, Exchange
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, render
@@ -63,6 +63,9 @@ class PartyView(LoginRequiredMixin, TemplateView):
             your_exchange = None
 
         form = UpDateParty(self.request.POST or None, instance=party)
+        joining_form = ParticipanJoinForm(self.request.POST or None)
+        leaving_form = ParticipanLeavingForm(self.request.POST or None)
+
         context = {
             'party': party,
             'users': users,
@@ -71,6 +74,8 @@ class PartyView(LoginRequiredMixin, TemplateView):
             'participants': participants,
             'exchanges': exchanges,
             'form': form,
+            'joining_form': joining_form,
+            'leaving_form': leaving_form,
             # 'current_user': current_user,
             'your_exchange': your_exchange,
             'admin': admin
@@ -150,8 +155,12 @@ class ParticipantEditView(LoginRequiredMixin, TemplateView):
 
     def post(self, request, **kwargs):
         participant = Participant.objects.get(party=self.kwargs.get('pk'), user=request.user)
-        participant.status = "Joined"
-        participant.save()
+        if 'join' in request.POST:
+            participant.status = "Joined"
+            participant.save()
+        else:
+            participant.status = "Left"
+            participant.save()
         return redirect('party_list')
 
 class ExchangeView(LoginRequiredMixin, TemplateView):

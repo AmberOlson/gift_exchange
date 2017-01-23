@@ -25,10 +25,11 @@
       {% endfor %}
     {% endif %}
   </div>
-% else %}
+{% else %}
   <form action="{% url 'party_participant_edit' party.id %}" method="post">
     {% csrf_token %}
-    <input type="submit" value="Create Exchange" />
+    <button type="submit", name="join" value="Join Exchange">button</button>
+    <button type="submit", name="left" value="Leave Exchange">seoncds</button>
   </form>
 {% endif %}
 

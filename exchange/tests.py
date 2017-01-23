@@ -120,11 +120,19 @@ class ParticipantAccepting(GiftExchangeTestCase):
         self.invited_user = User.objects.create_user(username="amber", email="amber@example.com", password="password")
         self.party = Party.objects.create()
         self.participant = Participant.objects.create(party=self.party, user=self.admin_user)
-        response = self.client.post(reverse('party_participant_edit', kwargs={'pk': self.party.id}))
+        response = self.client.post(reverse('party_participant_edit', kwargs={'pk': self.party.id}), {'join':[u'Join Exchange']})
         self.assertEqual(302, response.status_code)
         self.assertEquals(reverse('party_list'), response.url)
         self.assertTrue(Participant.objects.get(user=self.admin_user, party=self.party, admin="False", status="Joined"))
 
+    def test_not_accepting_invite(self):
+        self.invited_user = User.objects.create_user(username="amber", email="amber@example.com", password="password")
+        self.party = Party.objects.create()
+        self.participant = Participant.objects.create(party=self.party, user=self.admin_user)
+        response = self.client.post(reverse('party_participant_edit', kwargs={'pk': self.party.id}), {'left': [u'Leave Exchange']})
+        self.assertEqual(302, response.status_code)
+        self.assertEquals(reverse('party_list'), response.url)
+        self.assertTrue(Participant.objects.get(user=self.admin_user, party=self.party, admin="False", status="Left"))
 
 class signup(GiftExchangeTestCase):
 
