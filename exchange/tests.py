@@ -17,24 +17,35 @@ class ExchangeTestCase(GiftExchangeTestCase):
 
     def setUp(self):
         self.create_and_login_user()
+        self.party = Party.objects.create()
+        self.participant1 = Participant.objects.create(party=self.party, status = 'Joined')
+        self.participant2 = Participant.objects.create(party=self.party, status = 'Joined')
 
     def test_start_exchange(self):
-        """
-        set up a party,
-        add participanets
-        start the Exchange
-        assert echange were correclty created
-        """
-        # self.create_and_login_user()
-        party = Party.objects.create()
-        participant1 = Participant.objects.create(party=party)
-        participant2 = Participant.objects.create(party=party)
-        started_party, _ = start_exchange(party)
+
+        started_party, _ = start_exchange(self.party)
         self.assertEqual(started_party.status, "started")
-        self.assertEqual(1, Exchange.objects.filter(giver=participant1, party=party).count())
-        self.assertEqual(1, Exchange.objects.filter(receiver=participant1, party=party).count())
-        self.assertEqual(1, Exchange.objects.filter(giver=participant2, party=party).count())
-        self.assertEqual(1, Exchange.objects.filter(receiver=participant2, party=party).count())
+        self.assertEqual(1, Exchange.objects.filter(giver=self.participant1, party=self.party).count())
+        self.assertEqual(1, Exchange.objects.filter(receiver=self.participant1, party=self.party).count())
+        self.assertEqual(1, Exchange.objects.filter(giver=self.participant2, party=self.party).count())
+        self.assertEqual(1, Exchange.objects.filter(receiver=self.participant2, party=self.party).count())
+
+    def test_no_participating_exchange(self):
+        participant3 = Participant.objects.create(party=self.party, status = 'Left')
+        participant4 = Participant.objects.create(party=self.party, status = 'Invited')
+
+        started_party, _ = start_exchange(self.party)
+        self.assertEqual(started_party.status, "started")
+        self.assertEqual(1, Exchange.objects.filter(giver=self.participant1, party=self.party).count())
+        self.assertEqual(1, Exchange.objects.filter(receiver=self.participant1, party=self.party).count())
+        self.assertEqual(1, Exchange.objects.filter(giver=self.participant2, party=self.party).count())
+        self.assertEqual(1, Exchange.objects.filter(receiver=self.participant2, party=self.party).count())
+
+        self.assertEqual(0, Exchange.objects.filter(giver=participant3, party=self.party).count())
+        self.assertEqual(0, Exchange.objects.filter(receiver=participant3, party=self.party).count())
+
+        self.assertEqual(0, Exchange.objects.filter(giver=participant4, party=self.party).count())
+        self.assertEqual(0, Exchange.objects.filter(receiver=participant4, party=self.party).count())
 
 
 class CreatePartyTestCase(GiftExchangeTestCase):

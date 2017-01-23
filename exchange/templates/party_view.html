@@ -28,8 +28,8 @@
 {% else %}
   <form action="{% url 'party_participant_edit' party.id %}" method="post">
     {% csrf_token %}
-    <button type="submit", name="join" value="Join Exchange">button</button>
-    <button type="submit", name="left" value="Leave Exchange">seoncds</button>
+    <button type="submit", name="join" value="Join Exchange">Join Exchange</button>
+    <button type="submit", name="left" value="Leave Exchange">Leave Exchange</button>
   </form>
 {% endif %}
 
