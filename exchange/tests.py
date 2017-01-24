@@ -117,7 +117,7 @@ class CreateParticipant(GiftExchangeTestCase):
         self.assertTrue(Participant.objects.get(party=self.party.id, admin="False"))
         self.assertEqual(mail.outbox[0].subject, 'HI')
         self.assertEqual(mail.outbox[0].to, ["notuser@example.com"])
-        self.assertIn('www.localhost//signup/invited/1', mail.outbox[0].body)
+        self.assertIn('localhost:8000/signup/invited/1', mail.outbox[0].body)
         # a line in the shows what link is sent in the email
         self.assertEquals(reverse('party_list'), response.url)
         self.client.logout()

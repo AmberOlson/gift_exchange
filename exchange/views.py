@@ -1,6 +1,6 @@
 
 from django.views.generic import TemplateView
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from exchange.forms import PartyCreateForm, ParticipantCreateForm, SignUpForm, UpDateParty
 from exchange.models import Party, Participant, Exchange
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -20,7 +20,7 @@ class SignUpInvitedView(TemplateView):
         context = {'form': form, 'participant': participant}
         return context
 
-    def post(self, request,  **kwargs):
+    def post(self, request, **kwargs):
         context = self.get_context_data()
         if context["form"].is_valid():
             User.objects.create_user(username=context['form'].cleaned_data['username'], email=context['form'].cleaned_data['email'], password=context['form'].cleaned_data['password'])
@@ -118,15 +118,17 @@ class PartyDelete(LoginRequiredMixin, TemplateView):
     login_url = '/login/'
     template_name = "party_delete.html"
 
-    def get_context_data(self,  **kwargs):
+    def get_context_data(self, **kwargs):
         party = get_object_or_404(Party, pk=self.kwargs.get('pk'))
         context = {'party': party}
         return context
 
-    def post(self, request,  **kwargs):
-        party = get_object_or_404(Party, pk=self.kwargs.get('pk')).delete()
+    def post(self, request, **kwargs):
+        party = get_object_or_404(Party, pk=self.kwargs.get('pk'))
+        party.delete()
         return redirect('party_list')
         # party.delete()
+
 
 class PartyCreateView(LoginRequiredMixin, TemplateView):
     login_url = '/login/'
@@ -172,6 +174,7 @@ class ParticipantCreateView(LoginRequiredMixin, TemplateView):
             return redirect('party_list')
         return super(ParticipantCreateView, self).render_to_response(context)
 
+
 class ParticipantEditView(LoginRequiredMixin, TemplateView):
     login_url = '/login/'
 
@@ -184,6 +187,7 @@ class ParticipantEditView(LoginRequiredMixin, TemplateView):
             participant.status = "Left"
             participant.save()
         return redirect('party_list')
+
 
 class ExchangeView(LoginRequiredMixin, TemplateView):
 

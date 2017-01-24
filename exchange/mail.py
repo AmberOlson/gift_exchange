@@ -3,6 +3,7 @@ from django.template.loader import render_to_string
 from django.template.loader import get_template
 from django.core.mail import EmailMultiAlternatives, EmailMessage
 from django.template import Context
+from django.conf import settings
 
 
 # def sendmail(receiver, party):
@@ -32,9 +33,8 @@ from django.template import Context
 #     msg.send()
 
 def sendmail(reciever, participant):
-    link = "www.localhost/8000/signup/invited/" + str(participant.id)
-    msg_plain = render_to_string('email.txt', {'participant': participant}, {"link": link})
-    msg_html = render_to_string('email.html', {'participant': participant}, {"link": link})
+    msg_plain = render_to_string('email.txt', {'participant': participant, 'env':settings.ENVIRONMENT_DOMAIN})
+    msg_html = render_to_string('email.html', {'participant': participant, 'env':settings.ENVIRONMENT_DOMAIN})
 
     send_mail(
         'HI',
