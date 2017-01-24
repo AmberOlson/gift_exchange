@@ -15,7 +15,7 @@ class SignUpInvitedView(TemplateView):
     template_name = "signup_invited.html"
 
     def get_context_data(self, **kwargs):
-        form = SignUpForm(self.request.POST or None)  # instance= None
+        form = SignUpForm(self.request.POST or None)
         participant = Participant.objects.get(id=self.kwargs["pk"])
         context = {'form': form, 'participant': participant}
         return context
@@ -42,7 +42,7 @@ class SignUpView(TemplateView):
     template_name = "signup.html"
 
     def get_context_data(self):
-        form = SignUpForm(self.request.POST or None)  # instance= None
+        form = SignUpForm(self.request.POST or None)
         context = {'form': form}
         return context
 
@@ -65,7 +65,6 @@ class PartyListView(LoginRequiredMixin, TemplateView):
     template_name = "parties.html"
 
     def get_context_data(self):
-        # parties = Party.objects.all()
         parties = Party.objects.filter(participant__user=self.request.user)
         context = {'cat': 'candy', 'parties': parties}
         return context
@@ -92,21 +91,15 @@ class PartyView(LoginRequiredMixin, TemplateView):
         context = {
             'party': party,
             'users': users,
-            # 'participants': party.participant_set.all(),
-            # 'exchanges': party.exchange_set.all(),
             'participants': participants,
             'exchanges': exchanges,
             'form': form,
-            # 'current_user': current_user,
             'your_exchange': your_exchange,
             'admin': admin
         }
-        # import pdb; pdb.set_trace()
         return context
 
     def post(self, request, **kwargs):
-        # instance = Party.objects.get(id=self.kwargs.get('pk'))
-        # form = UpDateParty(request.POST or None, instance=instance)
         context = self.get_context_data()
         if context["form"].is_valid():
             context["form"].save()
@@ -127,7 +120,6 @@ class PartyDelete(LoginRequiredMixin, TemplateView):
         party = get_object_or_404(Party, pk=self.kwargs.get('pk'))
         party.delete()
         return redirect('party_list')
-        # party.delete()
 
 
 class PartyCreateView(LoginRequiredMixin, TemplateView):
@@ -135,7 +127,7 @@ class PartyCreateView(LoginRequiredMixin, TemplateView):
     template_name = "party_create.html"
 
     def get_context_data(self):
-        form = PartyCreateForm(self.request.POST or None)  # instance= None
+        form = PartyCreateForm(self.request.POST or None) 
         context = {'form': form}
         return context
 

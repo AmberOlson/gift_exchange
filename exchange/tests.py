@@ -51,8 +51,6 @@ class ExchangeTestCase(GiftExchangeTestCase):
 class CreatePartyTestCase(GiftExchangeTestCase):
 
     def test_create_party(self):
-        # User.objects.create_user(username="alex", email="alex@example.com", password="password")
-        # self.client.login(username="alex", password="password")
         self.create_and_login_user()
 
         form_data = {"name": "My Fun Party"}
@@ -94,8 +92,6 @@ class EditPartyTestCase(GiftExchangeTestCase):
 class CreateParticipant(GiftExchangeTestCase):
 
     def setUp(self):
-        # self.admin_user = User.objects.create_user(username="alex2", email="alex2@example.com", password="password")
-        # self.client.login(username="alex2", password="password")
         self.create_and_login_user()
 
         self.invited_user = User.objects.create_user(username="amber", email="amber@example.com", password="password")
@@ -113,15 +109,14 @@ class CreateParticipant(GiftExchangeTestCase):
         response = self.client.post(reverse('party_participant_create', kwargs={'pk': self.party.id}), form_data)
         self.assertEqual(302, response.status_code)
         self.assertEqual(len(mail.outbox), 1)
-        #somehow confirm that the user id is null?
-        self.assertTrue(Participant.objects.get(party=self.party.id, admin="False"))
+        self.assertTrue(Participant.objects.get(party=self.party.id, admin="False", user=None))
         self.assertEqual(mail.outbox[0].subject, 'HI')
         self.assertEqual(mail.outbox[0].to, ["notuser@example.com"])
         self.assertIn('localhost:8000/signup/invited/1', mail.outbox[0].body)
-        # a line in the shows what link is sent in the email
         self.assertEquals(reverse('party_list'), response.url)
         self.client.logout()
         participant = Participant.objects.last()
+
         form_data = {"username": "Candy", "email": "candy@example.com", "password": "password"}
         response = self.client.post(reverse('signup_invited', kwargs={'pk': participant.id}), form_data)
         self.assertEqual(302, response.status_code)
