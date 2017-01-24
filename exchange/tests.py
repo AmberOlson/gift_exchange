@@ -18,24 +18,24 @@ class ExchangeTestCase(GiftExchangeTestCase):
     def setUp(self):
         self.create_and_login_user()
         self.party = Party.objects.create()
-        self.participant1 = Participant.objects.create(party=self.party, status = 'JOINED')
-        self.participant2 = Participant.objects.create(party=self.party, status = 'JOINED')
+        self.participant1 = Participant.objects.create(party=self.party, status='JOINED')
+        self.participant2 = Participant.objects.create(party=self.party, status='JOINED')
 
     def test_start_exchange(self):
 
         started_party, _ = start_exchange(self.party)
-        self.assertEqual(started_party.status, "started")
+        self.assertEqual(started_party.status, "STARTED")
         self.assertEqual(1, Exchange.objects.filter(giver=self.participant1, party=self.party).count())
         self.assertEqual(1, Exchange.objects.filter(receiver=self.participant1, party=self.party).count())
         self.assertEqual(1, Exchange.objects.filter(giver=self.participant2, party=self.party).count())
         self.assertEqual(1, Exchange.objects.filter(receiver=self.participant2, party=self.party).count())
 
     def test_no_participating_exchange(self):
-        participant3 = Participant.objects.create(party=self.party, status = 'LEFT')
-        participant4 = Participant.objects.create(party=self.party, status = 'INVITED')
+        participant3 = Participant.objects.create(party=self.party, status='LEFT')
+        participant4 = Participant.objects.create(party=self.party, status='INVITED')
 
         started_party, _ = start_exchange(self.party)
-        self.assertEqual(started_party.status, "started")
+        self.assertEqual(started_party.status, "STARTED")
         self.assertEqual(1, Exchange.objects.filter(giver=self.participant1, party=self.party).count())
         self.assertEqual(1, Exchange.objects.filter(receiver=self.participant1, party=self.party).count())
         self.assertEqual(1, Exchange.objects.filter(giver=self.participant2, party=self.party).count())

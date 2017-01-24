@@ -3,7 +3,7 @@ from exchange.models import Participant, Exchange
 
 def start_exchange(party):
     exchange_list = []
-    party.status = "started"
+    party.status = "STARTED"
     party.save()
     participants = list(Participant.objects.filter(party=party, status='JOINED'))
     for counter, participant in enumerate(participants):
