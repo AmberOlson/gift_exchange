@@ -10,6 +10,7 @@ class Participant(models.Model):
     party = models.ForeignKey(Party)
     admin = models.BooleanField(default=False)
     user = models.ForeignKey(User, blank=True, null=True)
+    status = models.CharField(default='Invited', max_length=255)
 
     class Meta:
         unique_together = (("party", "user"),)

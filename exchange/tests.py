@@ -17,24 +17,35 @@ class ExchangeTestCase(GiftExchangeTestCase):
 
     def setUp(self):
         self.create_and_login_user()
+        self.party = Party.objects.create()
+        self.participant1 = Participant.objects.create(party=self.party, status = 'Joined')
+        self.participant2 = Participant.objects.create(party=self.party, status = 'Joined')
 
     def test_start_exchange(self):
-        """
-        set up a party,
-        add participanets
-        start the Exchange
-        assert echange were correclty created
-        """
-        # self.create_and_login_user()
-        party = Party.objects.create()
-        participant1 = Participant.objects.create(party=party)
-        participant2 = Participant.objects.create(party=party)
-        started_party, _ = start_exchange(party)
+
+        started_party, _ = start_exchange(self.party)
         self.assertEqual(started_party.status, "started")
-        self.assertEqual(1, Exchange.objects.filter(giver=participant1, party=party).count())
-        self.assertEqual(1, Exchange.objects.filter(receiver=participant1, party=party).count())
-        self.assertEqual(1, Exchange.objects.filter(giver=participant2, party=party).count())
-        self.assertEqual(1, Exchange.objects.filter(receiver=participant2, party=party).count())
+        self.assertEqual(1, Exchange.objects.filter(giver=self.participant1, party=self.party).count())
+        self.assertEqual(1, Exchange.objects.filter(receiver=self.participant1, party=self.party).count())
+        self.assertEqual(1, Exchange.objects.filter(giver=self.participant2, party=self.party).count())
+        self.assertEqual(1, Exchange.objects.filter(receiver=self.participant2, party=self.party).count())
+
+    def test_no_participating_exchange(self):
+        participant3 = Participant.objects.create(party=self.party, status = 'Left')
+        participant4 = Participant.objects.create(party=self.party, status = 'Invited')
+
+        started_party, _ = start_exchange(self.party)
+        self.assertEqual(started_party.status, "started")
+        self.assertEqual(1, Exchange.objects.filter(giver=self.participant1, party=self.party).count())
+        self.assertEqual(1, Exchange.objects.filter(receiver=self.participant1, party=self.party).count())
+        self.assertEqual(1, Exchange.objects.filter(giver=self.participant2, party=self.party).count())
+        self.assertEqual(1, Exchange.objects.filter(receiver=self.participant2, party=self.party).count())
+
+        self.assertEqual(0, Exchange.objects.filter(giver=participant3, party=self.party).count())
+        self.assertEqual(0, Exchange.objects.filter(receiver=participant3, party=self.party).count())
+
+        self.assertEqual(0, Exchange.objects.filter(giver=participant4, party=self.party).count())
+        self.assertEqual(0, Exchange.objects.filter(receiver=participant4, party=self.party).count())
 
 
 class CreatePartyTestCase(GiftExchangeTestCase):
@@ -50,6 +61,7 @@ class CreatePartyTestCase(GiftExchangeTestCase):
         self.assertEqual(302, response.status_code)
         self.assertEquals(reverse('party_list'), response.url)
         self.assertTrue(Party.objects.get(name="My Fun Party"))
+        self.assertTrue(Participant.objects.get(user=self.admin_user, admin=True))
 
     def test_create_party__login_required__user_not_logged_in(self):
         form_data = {"name": "My Fun Party"}
@@ -58,6 +70,26 @@ class CreatePartyTestCase(GiftExchangeTestCase):
         self.assertEqual(302, response.status_code)
         self.assertEquals("%s?next=%s" % (reverse('login'), reverse('party_create')), response.url)
         self.assertFalse(Party.objects.all().exists())
+
+class EditPartyTestCase(GiftExchangeTestCase):
+    def setUp(self):
+        self.create_and_login_user()
+        self.party = Party.objects.create(name="My Fun Party")
+        Participant.objects.create(user=self.admin_user, party=self.party)
+
+    def test_edit_party(self):
+        form_data = {"name": "New Party Name"}
+        response = self.client.post(reverse('party_view', kwargs={'pk': self.party.id}), form_data)
+
+        self.assertEqual(302, response.status_code)
+        self.assertEquals(reverse('party_list'), response.url)
+        self.assertTrue(Party.objects.get(name="New Party Name"))
+        self.assertFalse(Party.objects.filter(name="My Fun Party"))
+
+    def test_delete(self):
+        response = self.client.post(reverse('party_delete', kwargs={'pk': self.party.id}))
+        self.assertFalse(Party.objects.filter(name="My Fun Party"))
+
 
 class CreateParticipant(GiftExchangeTestCase):
 
@@ -95,6 +127,35 @@ class CreateParticipant(GiftExchangeTestCase):
         self.assertEqual(302, response.status_code)
         user = User.objects.get(username= "Candy")
         self.assertTrue(Participant.objects.get(user=user.id, party=self.party.id, admin=False))
+
+    # def test_add_same_user(self):
+    #     first = Participant.objects.create(user=self.invited_user, party=self.party)
+    #     second = Participant.objects.create(user=self.invited_user, party=self.party)
+    #     self.assertTrue(Participant.objects.filter(id=first.id))
+    #     self.assertFalse(Participant.objects.filter(id=second.id))
+
+class ParticipantAccepting(GiftExchangeTestCase):
+
+    def setUp(self):
+        self.create_and_login_user()
+
+    def test_accepting_invite(self):
+        self.invited_user = User.objects.create_user(username="amber", email="amber@example.com", password="password")
+        self.party = Party.objects.create()
+        self.participant = Participant.objects.create(party=self.party, user=self.admin_user)
+        response = self.client.post(reverse('party_participant_edit', kwargs={'pk': self.party.id}), {'join':[u'Join Exchange']})
+        self.assertEqual(302, response.status_code)
+        self.assertEquals(reverse('party_list'), response.url)
+        self.assertTrue(Participant.objects.get(user=self.admin_user, party=self.party, admin="False", status="Joined"))
+
+    def test_not_accepting_invite(self):
+        self.invited_user = User.objects.create_user(username="amber", email="amber@example.com", password="password")
+        self.party = Party.objects.create()
+        self.participant = Participant.objects.create(party=self.party, user=self.admin_user)
+        response = self.client.post(reverse('party_participant_edit', kwargs={'pk': self.party.id}), {'left': [u'Leave Exchange']})
+        self.assertEqual(302, response.status_code)
+        self.assertEquals(reverse('party_list'), response.url)
+        self.assertTrue(Participant.objects.get(user=self.admin_user, party=self.party, admin="False", status="Left"))
 
 class signup(GiftExchangeTestCase):
 

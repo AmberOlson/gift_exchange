@@ -1,12 +1,9 @@
-from django.shortcuts import render
-from django.views import View
-from django.http import HttpResponse
+
 from django.views.generic import TemplateView
 from django.shortcuts import redirect
-from exchange.forms import PartyCreateForm, ParticipantCreateForm, SignUpForm
+from exchange.forms import PartyCreateForm, ParticipantCreateForm, SignUpForm, UpDateParty
 from exchange.models import Party, Participant, Exchange
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from exchange.domain import start_exchange
@@ -68,7 +65,9 @@ class PartyListView(LoginRequiredMixin, TemplateView):
     template_name = "parties.html"
 
     def get_context_data(self):
-        context = {'cat': 'candy', 'parties': Party.objects.all()}
+        # parties = Party.objects.all()
+        parties = Party.objects.filter(participant__user=self.request.user)
+        context = {'cat': 'candy', 'parties': parties}
         return context
 
 
@@ -81,9 +80,53 @@ class PartyView(LoginRequiredMixin, TemplateView):
         participants = Participant.objects.filter(party=self.kwargs.get('pk'))
         exchanges = Exchange.objects.filter(party=self.kwargs.get('pk'))
         party = get_object_or_404(Party, pk=self.kwargs.get('pk'))
-        context = {'party': party, 'users': users, 'participants': participants, 'exchanges': exchanges}
+        admin = Participant.objects.filter(party=party, user=self.request.user, admin=True)
+        current_user = Participant.objects.filter(party=party, user=self.request.user)
+        try:
+            your_exchange = Exchange.objects.get(party=party, giver=current_user)
+        except Exchange.DoesNotExist:
+            your_exchange = None
+
+        form = UpDateParty(self.request.POST or None, instance=party)
+
+        context = {
+            'party': party,
+            'users': users,
+            # 'participants': party.participant_set.all(),
+            # 'exchanges': party.exchange_set.all(),
+            'participants': participants,
+            'exchanges': exchanges,
+            'form': form,
+            # 'current_user': current_user,
+            'your_exchange': your_exchange,
+            'admin': admin
+        }
+        # import pdb; pdb.set_trace()
         return context
 
+    def post(self, request, **kwargs):
+        # instance = Party.objects.get(id=self.kwargs.get('pk'))
+        # form = UpDateParty(request.POST or None, instance=instance)
+        context = self.get_context_data()
+        if context["form"].is_valid():
+            context["form"].save()
+            return redirect('party_list')
+        return direct_to_template(request, 'my_template.html', {'form': form})
+
+
+class PartyDelete(LoginRequiredMixin, TemplateView):
+    login_url = '/login/'
+    template_name = "party_delete.html"
+
+    def get_context_data(self,  **kwargs):
+        party = get_object_or_404(Party, pk=self.kwargs.get('pk'))
+        context = {'party': party}
+        return context
+
+    def post(self, request,  **kwargs):
+        party = get_object_or_404(Party, pk=self.kwargs.get('pk')).delete()
+        return redirect('party_list')
+        # party.delete()
 
 class PartyCreateView(LoginRequiredMixin, TemplateView):
     login_url = '/login/'
@@ -97,8 +140,8 @@ class PartyCreateView(LoginRequiredMixin, TemplateView):
     def post(self, request, *args, **kwargs):
         context = self.get_context_data()
         if context["form"].is_valid():
-            print 'yes done'
-            Party.objects.create(name=context['form'].cleaned_data['name'])
+            party = Party.objects.create(name=context['form'].cleaned_data['name'])
+            Participant.objects.create(party=party, user=request.user, admin=True)
             return redirect('party_list')
         return super(TemplateView, self).render_to_response(context)
 
@@ -129,6 +172,18 @@ class ParticipantCreateView(LoginRequiredMixin, TemplateView):
             return redirect('party_list')
         return super(ParticipantCreateView, self).render_to_response(context)
 
+class ParticipantEditView(LoginRequiredMixin, TemplateView):
+    login_url = '/login/'
+
+    def post(self, request, **kwargs):
+        participant = Participant.objects.get(party=self.kwargs.get('pk'), user=request.user)
+        if 'join' in request.POST:
+            participant.status = "Joined"
+            participant.save()
+        else:
+            participant.status = "Left"
+            participant.save()
+        return redirect('party_list')
 
 class ExchangeView(LoginRequiredMixin, TemplateView):
 

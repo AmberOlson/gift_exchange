@@ -1,26 +1,57 @@
-<h1> Hi </h1>
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static '/style.css' %}" />
+
+{% include "header.html" %}
+
+
 <h2> Party Name: {{party.name}} </h2>
 <br>
-{{party.status}}
-<a href = "{% url 'party_participant_create' party.id %}"> Invite a persons </a>
 
-<h2> People Parcipating: </h2>
-{% for p in participants %}
-  {{p.user}}<br>
-{% endfor %}
 
-<form action="{% url 'party_exchange' party.id %}" method="post">
-  {% csrf_token %}
-  <input type="submit" value="Submit" />
+{% if admin %}
+  <div class ="party_admin_nav">
+    {{party.status}}
+    <a href = "{% url 'party_participant_create' party.id %}"> Invite a persons </a>
+    <a href = "{% url 'party_delete' party.id %}"> Delete </a>
+    {% if not exchanges %}
+      <form action="{% url 'party_exchange' party.id %}" method="post">
+        {% csrf_token %}
+        <input type="submit" value="Create Exchange" />
+      </form>
+    {% else %}
+      <h2> Exchanges: </h2>
+      {% for e in exchanges %}
+        <li> {{e.giver.user}} to {{e.receiver.user}}</li><br>
+      {% endfor %}
+    {% endif %}
+  </div>
+{% else %}
+  <form action="{% url 'party_participant_edit' party.id %}" method="post">
+    {% csrf_token %}
+    <button type="submit", name="join" value="Join Exchange">Join Exchange</button>
+    <button type="submit", name="left" value="Leave Exchange">Leave Exchange</button>
+  </form>
+{% endif %}
+
+  <h2> People Parcipating: </h2>
+  {% for p in participants %}
+    {{p.user}}
+    {{p.status}}<br>
+  {% endfor %}
+
+
+{% if your_exchange %}
+  <h1> Your match</h1>
+  {{your_exchange.receiver.user}}
+{% endif %}
+
+<form action="{% url 'party_view' party.id %}" method="post">
+    {% csrf_token %}
+    {{form}}
+    <input type="submit" value="Submit" />
 </form>
 
-<h2> Exchanges: </h2>
-{% for e in exchanges %}
-  <li> {{e.giver.user}} to {{e.receiver.user}}</li><br>
-{% endfor %}
-
-
-<h1> Invite a person </h1>
+<!-- <h1> Invite a person </h1>
 
 <form action="{% url 'party_participant_create' party.id %}" method="post">
     {% csrf_token %}
@@ -29,4 +60,4 @@
       <label for="choice{{ forloop.counter }}">{{ user.username }}</label><br />
     {% endfor %}
     <input type="submit" value="Submit" />
-</form>
+</form> -->
