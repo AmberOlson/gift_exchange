@@ -5,7 +5,12 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 class Party(models.Model):
-    status = models.CharField(default='joining', max_length=255)
+    STATUS_CHOICES =(
+        ('JOINED', 'joined'),
+        ('INVITED', 'invited'),
+        ('LEFT', 'left'),
+    )
+    status = models.CharField(default='INVITED', max_length=255, choices=STATUS_CHOICES)
     name = models.CharField(max_length=255)
 
 

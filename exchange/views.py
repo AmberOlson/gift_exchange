@@ -127,7 +127,7 @@ class PartyCreateView(LoginRequiredMixin, TemplateView):
     template_name = "party_create.html"
 
     def get_context_data(self):
-        form = PartyCreateForm(self.request.POST or None) 
+        form = PartyCreateForm(self.request.POST or None)
         context = {'form': form}
         return context
 
@@ -173,10 +173,10 @@ class ParticipantEditView(LoginRequiredMixin, TemplateView):
     def post(self, request, **kwargs):
         participant = Participant.objects.get(party=self.kwargs.get('pk'), user=request.user)
         if 'join' in request.POST:
-            participant.status = "Joined"
+            participant.status = "JOINED"
             participant.save()
         else:
-            participant.status = "Left"
+            participant.status = "LEFT"
             participant.save()
         return redirect('party_list')
 
