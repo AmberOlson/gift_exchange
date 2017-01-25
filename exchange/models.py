@@ -12,7 +12,7 @@ class Party(models.Model):
         ("JOINING", 'joining'),
         ("STARTED", 'started')
     )
-    status = models.CharField(default='JOINING', max_length=255, choices=STATUS_CHOICES)
+    status = models.CharField(default=JOINING, max_length=255, choices=STATUS_CHOICES)
     name = models.CharField(max_length=255)
 
 
@@ -30,7 +30,7 @@ class Participant(models.Model):
     party = models.ForeignKey(Party)
     admin = models.BooleanField(default=False)
     user = models.ForeignKey(User, blank=True, null=True)
-    status = models.CharField(default='INVITED', max_length=255, choices=STATUS_CHOICES)
+    status = models.CharField(default=INVITED, max_length=255, choices=STATUS_CHOICES)
 
     class Meta:
         unique_together = (("party", "user"),)
