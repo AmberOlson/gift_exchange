@@ -6,7 +6,7 @@
 
 <h2> Party Name: {{party.name}} </h2>
 <br>
-
+<a href = "{% url 'party_participant_create' party.id %}"> Invite a persons </a>
 
 {% if admin %}
   <div class ="party_admin_nav">

@@ -94,6 +94,8 @@ class EditPartyTestCase(GiftExchangeTestCase):
 
     def test_delete(self):
         response = self.client.post(reverse('party_delete', kwargs={'pk': self.party.id}))
+        self.assertEqual(302, response.status_code)
+        self.assertEquals(reverse('party_list'), response.url)
         self.assertFalse(Party.objects.filter(name="My Fun Party"))
 
 

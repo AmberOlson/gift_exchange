@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from exchange.domain import start_exchange
 from exchange.mail import sendmail
+from django.db import IntegrityError
 
 
 class SignUpInvitedView(TemplateView):
@@ -104,7 +105,7 @@ class PartyView(LoginRequiredMixin, TemplateView):
         if context["form"].is_valid():
             context["form"].save()
             return redirect('party_list')
-        return direct_to_template(request, 'my_template.html', {'form': form})
+        return super(TemplateView, self).render_to_response(context)
 
 
 class PartyDelete(LoginRequiredMixin, TemplateView):
@@ -159,12 +160,12 @@ class ParticipantCreateView(LoginRequiredMixin, TemplateView):
                 Participant.objects.create(user=user, party=party)
                 return redirect('party_list')
             except User.DoesNotExist:
-                pass
-
-            participant = Participant.objects.create(party=party)
-            sendmail(context['form'].cleaned_data['participant'], participant)
-            return redirect('party_list')
-        return super(ParticipantCreateView, self).render_to_response(context)
+                participant = Participant.objects.create(party=party)
+                sendmail(context['form'].cleaned_data['participant'], participant)
+                return redirect('party_list')
+            except IntegrityError:
+                print "here"
+        return super(TemplateView, self).render_to_response(context)
 
 
 class ParticipantEditView(LoginRequiredMixin, TemplateView):
