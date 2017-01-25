@@ -18,24 +18,24 @@ class ExchangeTestCase(GiftExchangeTestCase):
     def setUp(self):
         self.create_and_login_user()
         self.party = Party.objects.create()
-        self.participant1 = Participant.objects.create(party=self.party, status='JOINED')
-        self.participant2 = Participant.objects.create(party=self.party, status='JOINED')
+        self.participant1 = Participant.objects.create(party=self.party, status=Participant.JOINED)
+        self.participant2 = Participant.objects.create(party=self.party, status=Participant.JOINED)
 
     def test_start_exchange(self):
 
         started_party, _ = start_exchange(self.party)
-        self.assertEqual(started_party.status, "STARTED")
+        self.assertEqual(started_party.status, Party.STARTED)
         self.assertEqual(1, Exchange.objects.filter(giver=self.participant1, party=self.party).count())
         self.assertEqual(1, Exchange.objects.filter(receiver=self.participant1, party=self.party).count())
         self.assertEqual(1, Exchange.objects.filter(giver=self.participant2, party=self.party).count())
         self.assertEqual(1, Exchange.objects.filter(receiver=self.participant2, party=self.party).count())
 
     def test_no_participating_exchange(self):
-        participant3 = Participant.objects.create(party=self.party, status='LEFT')
-        participant4 = Participant.objects.create(party=self.party, status='INVITED')
+        participant3 = Participant.objects.create(party=self.party, status=Participant.LEFT)
+        participant4 = Participant.objects.create(party=self.party, status=Participant.INVITED)
 
         started_party, _ = start_exchange(self.party)
-        self.assertEqual(started_party.status, "STARTED")
+        self.assertEqual(started_party.status, Party.STARTED)
         self.assertEqual(1, Exchange.objects.filter(giver=self.participant1, party=self.party).count())
         self.assertEqual(1, Exchange.objects.filter(receiver=self.participant1, party=self.party).count())
         self.assertEqual(1, Exchange.objects.filter(giver=self.participant2, party=self.party).count())
@@ -141,7 +141,7 @@ class ParticipantAccepting(GiftExchangeTestCase):
         response = self.client.post(reverse('party_participant_edit', kwargs={'pk': self.party.id}), {'join':[u'Join Exchange']})
         self.assertEqual(302, response.status_code)
         self.assertEquals(reverse('party_list'), response.url)
-        self.assertTrue(Participant.objects.get(user=self.admin_user, party=self.party, admin="False", status="JOINED"))
+        self.assertTrue(Participant.objects.get(user=self.admin_user, party=self.party, admin="False", status=Participant.JOINED))
 
     def test_not_accepting_invite(self):
         self.invited_user = User.objects.create_user(username="amber", email="amber@example.com", password="password")
@@ -150,7 +150,7 @@ class ParticipantAccepting(GiftExchangeTestCase):
         response = self.client.post(reverse('party_participant_edit', kwargs={'pk': self.party.id}), {'left': [u'Leave Exchange']})
         self.assertEqual(302, response.status_code)
         self.assertEquals(reverse('party_list'), response.url)
-        self.assertTrue(Participant.objects.get(user=self.admin_user, party=self.party, admin="False", status="LEFT"))
+        self.assertTrue(Participant.objects.get(user=self.admin_user, party=self.party, admin="False", status=Participant.LEFT))
 
 class signup(GiftExchangeTestCase):
 

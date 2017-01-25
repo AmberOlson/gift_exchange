@@ -5,6 +5,9 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 class Party(models.Model):
+    JOINING = 'joining'
+    STARTED = 'started'
+
     STATUS_CHOICES = (
         ("JOINING", 'joining'),
         ("STARTED", 'started')
@@ -14,6 +17,10 @@ class Party(models.Model):
 
 
 class Participant(models.Model):
+    JOINED = "joined"
+    LEFT = 'left'
+    INVITED = 'invited'
+
     STATUS_CHOICES =(
         ('JOINED', 'joined'),
         ('INVITED', 'invited'),

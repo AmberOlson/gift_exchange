@@ -173,10 +173,10 @@ class ParticipantEditView(LoginRequiredMixin, TemplateView):
     def post(self, request, **kwargs):
         participant = Participant.objects.get(party=self.kwargs.get('pk'), user=request.user)
         if 'join' in request.POST:
-            participant.status = "JOINED"
+            participant.status = Participant.JOINED
             participant.save()
         else:
-            participant.status = "LEFT"
+            participant.status = Participant.LEFT
             participant.save()
         return redirect('party_list')
 
