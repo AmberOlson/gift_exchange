@@ -9,6 +9,8 @@ from django.contrib.auth import authenticate, login
 from exchange.domain import start_exchange
 from exchange.mail import sendmail
 from django.db import IntegrityError
+from django import forms
+from django.utils.translation import ugettext_lazy as _
 
 
 class SignUpInvitedView(TemplateView):
@@ -164,7 +166,7 @@ class ParticipantCreateView(LoginRequiredMixin, TemplateView):
                 sendmail(context['form'].cleaned_data['participant'], participant)
                 return redirect('party_list')
             except IntegrityError:
-                print "here"
+                context['message'] = "can't add person again"
         return super(TemplateView, self).render_to_response(context)
 
 

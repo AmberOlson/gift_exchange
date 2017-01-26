@@ -1,8 +1,6 @@
 <h1> Invite Guest:</h1>
 
-{% if form.errors %}
-    <p>Your username and password didn't match. Please try again.</p>
-{% endif %}
+{{message}}
 
 <form action="{% url 'party_participant_create' party.id %}" method="post">
     {% csrf_token %}

@@ -1,12 +1,13 @@
-from django.test import TestCase
+from django.test import TestCase, TransactionTestCase
 from django.contrib.auth.models import User
 from django.shortcuts import reverse
 from exchange.models import Party, Exchange, Participant
 from exchange.domain import start_exchange
 from django.core import mail
+from django.db import IntegrityError
 
 
-class GiftExchangeTestCase(TestCase):
+class GiftExchangeTestCase(TransactionTestCase):
 
     def create_and_login_user(self):
         self.admin_user = User.objects.create_user(username="alex2", email="alex2@example.com", password="password")
@@ -133,11 +134,10 @@ class CreateParticipant(GiftExchangeTestCase):
         user = User.objects.get(username="Candy")
         self.assertTrue(Participant.objects.get(user=user.id, party=self.party.id, admin=False))
 
-    # def test_add_same_user(self):
-    #     first = Participant.objects.create(user=self.invited_user, party=self.party)
-    #     second = Participant.objects.create(user=self.invited_user, party=self.party)
-    #     self.assertTrue(Participant.objects.filter(id=first.id))
-    #     self.assertFalse(Participant.objects.filter(id=second.id))
+    def test_add_same_user(self):
+        Participant.objects.create(user=self.invited_user, party=self.party)
+        with self.assertRaises(IntegrityError):
+            Participant.objects.create(user=self.invited_user, party=self.party)
 
 
 class ParticipantAccepting(GiftExchangeTestCase):
