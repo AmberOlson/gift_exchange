@@ -9,8 +9,6 @@ from django.contrib.auth import authenticate, login
 from exchange.domain import start_exchange
 from exchange.mail import sendmail
 from django.db import IntegrityError
-from django import forms
-from django.utils.translation import ugettext_lazy as _
 
 
 class SignUpInvitedView(TemplateView):
