@@ -1,5 +1,12 @@
+<h1> Sign Up for Gift Exchange </h1>
+
 <form action="{% url 'signup' %}" method="post">
   {% csrf_token %}
-  {{form}}
+  <table>
+    {% for field in form %}
+      <tr><td>{{field.label}}</td></tr>
+      <tr><td>{{field}}</td></tr>
+    {% endfor %}
+  </table>
   <input type="submit" value="Submit" />
 </form>

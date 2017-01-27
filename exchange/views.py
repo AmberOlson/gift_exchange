@@ -24,9 +24,9 @@ class SignUpInvitedView(TemplateView):
     def post(self, request, **kwargs):
         context = self.get_context_data()
         if context["form"].is_valid():
-            User.objects.create_user(username=context['form'].cleaned_data['username'], email=context['form'].cleaned_data['email'], password=context['form'].cleaned_data['password'])
+            User.objects.create_user(username=context['form'].cleaned_data['username'], email=context['form'].cleaned_data['email'], password=context['form'].cleaned_data['password1'])
             username = request.POST['username']
-            password = request.POST['password']
+            password = request.POST['password1']
             user = authenticate(username=username, password=password)
 
             if user is not None:
@@ -50,9 +50,9 @@ class SignUpView(TemplateView):
     def post(self, request):
         context = self.get_context_data()
         if context["form"].is_valid():
-            User.objects.create_user(username=context['form'].cleaned_data['username'], email=context['form'].cleaned_data['email'], password=context['form'].cleaned_data['password'])
+            User.objects.create_user(username=context['form'].cleaned_data['username'], email=context['form'].cleaned_data['email'], password=context['form'].cleaned_data['password1'])
             username = request.POST['username']
-            password = request.POST['password']
+            password = request.POST['password1']
             user = authenticate(username=username, password=password)
 
             if user is not None:

@@ -128,7 +128,7 @@ class CreateParticipant(GiftExchangeTestCase):
         self.client.logout()
         participant = Participant.objects.last()
 
-        form_data = {"username": "Candy", "email": "candy@example.com", "password": "password"}
+        form_data = {"username": "Candy", "email": "candy@example.com", "password1": "password", "password2": "password"}
         response = self.client.post(reverse('signup_invited', kwargs={'pk': participant.id}), form_data)
         self.assertEqual(302, response.status_code)
         user = User.objects.get(username="Candy")
@@ -167,7 +167,7 @@ class ParticipantAccepting(GiftExchangeTestCase):
 class signup(GiftExchangeTestCase):
 
     def test_sign_up(self):
-        form_data = {"username": "Amber", "email": "amberolson@gmail.com", "password": "password"}
+        form_data = {"username": "Amber", "email": "amberolson@gmail.com", "password1": "password", "password2": "password"}
         response = self.client.post(reverse('signup'), form_data)
 
         self.assertEqual(302, response.status_code)
