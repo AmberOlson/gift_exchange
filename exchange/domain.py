@@ -5,6 +5,9 @@ def start_exchange(party):
     exchange_list = []
     party.status = Party.STARTED
     party.save()
+
+    if Exchange.objects.filter(party=party):
+        return 'exchanges not created'
     participants = list(Participant.objects.filter(party=party, status=Participant.JOINED))
     for counter, participant in enumerate(participants):
         exchange = Exchange.objects.create(giver=participant, receiver=participants[counter-1], party=party)

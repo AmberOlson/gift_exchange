@@ -48,6 +48,10 @@ class ExchangeTestCase(GiftExchangeTestCase):
         self.assertEqual(0, Exchange.objects.filter(giver=participant4, party=self.party).count())
         self.assertEqual(0, Exchange.objects.filter(receiver=participant4, party=self.party).count())
 
+    def test_second_exchange_attempt(self):
+        start_exchange(self.party)
+        result = start_exchange(self.party)
+        self.assertEqual(result, "exchanges not created")
 
 class CreatePartyTestCase(GiftExchangeTestCase):
 
