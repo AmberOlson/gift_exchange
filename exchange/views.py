@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from exchange.domain import start_exchange
 from exchange.mail import sendmail
+from exchange.signup import signup, match_user_to_party
 from django.db import IntegrityError
 
 
@@ -24,15 +25,20 @@ class SignUpInvitedView(TemplateView):
     def post(self, request, **kwargs):
         context = self.get_context_data()
         if context["form"].is_valid():
-            User.objects.create_user(username=context['form'].cleaned_data['username'], email=context['form'].cleaned_data['email'], password=context['form'].cleaned_data['password1'])
-            username = request.POST['username']
-            password = request.POST['password1']
-            user = authenticate(username=username, password=password)
-
+            username = context['form'].cleaned_data['username']
+            email = context['form'].cleaned_data['email']
+            password = context['form'].cleaned_data['password1']
+            user = signup(username, email, password)
+            # User.objects.create_user(username=context['form'].cleaned_data['username'], email=context['form'].cleaned_data['email'], password=context['form'].cleaned_data['password1'])
+            # username = request.POST['username']
+            # password = request.POST['password1']
+            # user = authenticate(username=username, password=password)
+            #
             if user is not None:
                 participant = Participant.objects.get(id=self.kwargs["pk"])
-                participant.user_id = user.id
-                participant.save()
+                match_user_to_party(participant, user)
+                # participant.user_id = user.id
+                # participant.save()
                 login(request, user)
             return redirect('party_list')
         return super(TemplateView, self).render_to_response(context)
@@ -50,11 +56,15 @@ class SignUpView(TemplateView):
     def post(self, request):
         context = self.get_context_data()
         if context["form"].is_valid():
-            User.objects.create_user(username=context['form'].cleaned_data['username'], email=context['form'].cleaned_data['email'], password=context['form'].cleaned_data['password1'])
-            username = request.POST['username']
-            password = request.POST['password1']
-            user = authenticate(username=username, password=password)
-
+            username = context['form'].cleaned_data['username']
+            email = context['form'].cleaned_data['email']
+            password = context['form'].cleaned_data['password1']
+            user = signup(username, email, password)
+        #     User.objects.create_user(username=context['form'].cleaned_data['username'], email=context['form'].cleaned_data['email'], password=context['form'].cleaned_data['password1'])
+        #     username = request.POST['username']
+        #     password = request.POST['password1']
+        #     user = authenticate(username=username, password=password)
+        #
             if user is not None:
                 login(request, user)
             return redirect('party_list')

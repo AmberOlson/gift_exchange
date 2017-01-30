@@ -1,5 +1,9 @@
 <h1> Sign Up for Gift Exchange </h1>
 
+{% if form.errors %}
+     <p>Your username and password didn't match. Please try again.</p>
+ {% endif %}
+
 <form action="{% url 'signup' %}" method="post">
   {% csrf_token %}
   <table>
