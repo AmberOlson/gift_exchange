@@ -50,8 +50,10 @@ class ExchangeTestCase(GiftExchangeTestCase):
 
     def test_second_exchange_attempt(self):
         start_exchange(self.party)
-        result = start_exchange(self.party)
-        self.assertEqual(result, "exchanges not created")
+        with self.assertRaises(Exception) as context:
+            start_exchange(self.party)
+
+        self.assertTrue('exchanges already created' in context.exception)
 
 class CreatePartyTestCase(GiftExchangeTestCase):
 
