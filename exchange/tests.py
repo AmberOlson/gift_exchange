@@ -145,6 +145,16 @@ class CreateParticipant(GiftExchangeTestCase):
         with self.assertRaises(IntegrityError):
             Participant.objects.create(user=self.invited_user, party=self.party)
 
+    def test_create_participant_empty_form(self):
+        form_data = {"participant": ""}
+        response = self.client.post(reverse('party_participant_create', kwargs={'pk': self.party.id}), form_data)
+        self.assertContains(response, 'This field is required.', 1, 200)
+
+    def test_create_participant_not_email_form(self):
+        form_data = {"participant": "amber"}
+        response = self.client.post(reverse('party_participant_create', kwargs={'pk': self.party.id}), form_data)
+        self.assertContains(response, 'Enter a valid email address', 1, 200)
+
 
 class ParticipantAccepting(GiftExchangeTestCase):
 
