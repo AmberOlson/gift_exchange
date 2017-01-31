@@ -3,5 +3,7 @@
   <nav>
     <a href = "{% url 'party_list' %}"> Party List </a>
     <a href = "{% url 'party_create' %}"> Create a party </a>
+    <!-- <a href="{% url 'logout' %}"> Logout</a> -->
+    <a href="{% url 'logout' %}?next={% url 'signup' %}"> Logout</a>
   </nav>
 </header>

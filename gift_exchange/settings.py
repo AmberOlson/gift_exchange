@@ -32,13 +32,13 @@ LOGIN_REDIRECT_URL = '/parties/'
 # Application definition
 
 INSTALLED_APPS = [
+    'exchange',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'exchange',
 ]
 
 MIDDLEWARE = [

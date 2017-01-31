@@ -5,7 +5,7 @@ from exchange.forms import PartyCreateForm, ParticipantCreateForm, SignUpForm, U
 from exchange.models import Party, Participant, Exchange
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import login, logout
 from exchange.domain import start_exchange
 from exchange.mail import sendmail
 from exchange.signup import signup, match_user_to_party
@@ -69,6 +69,14 @@ class SignUpView(TemplateView):
                 login(request, user)
             return redirect('party_list')
         return super(TemplateView, self).render_to_response(context)
+
+
+class LogOutView(LoginRequiredMixin, TemplateView):
+    login_url = '/login/'
+
+    def logout_view(self, request):
+        logout(request)
+        return redirect('signup')
 
 
 class PartyListView(LoginRequiredMixin, TemplateView):
