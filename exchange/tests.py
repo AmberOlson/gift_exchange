@@ -5,9 +5,18 @@ from exchange.models import Party, Exchange, Participant
 from exchange.domain import start_exchange
 from django.core import mail
 from django.db import IntegrityError
+from exchange.factories import create_party, create_user, create_participant
 
 
-class GiftExchangeTestCase(TransactionTestCase):
+class TestFactories(TestCase):
+
+    def test_facotries(self):
+        party = create_party()
+        self.assertEqual(party.name, 'Party')
+        party = create_party('FUNFUNFUN')
+        self.assertEqual(party.name, 'FUNFUNFUN')
+
+class GiftExchangeTestCase(TestCase):
 
     def create_and_login_user(self):
         self.admin_user = User.objects.create_user(username="alex2", email="alex2@example.com", password="password")
@@ -54,6 +63,7 @@ class ExchangeTestCase(GiftExchangeTestCase):
             start_exchange(self.party)
 
         self.assertTrue('exchanges already created' in context.exception)
+
 
 class CreatePartyTestCase(GiftExchangeTestCase):
 
