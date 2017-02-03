@@ -8,14 +8,6 @@ from django.db import IntegrityError
 from exchange.factories import create_party, create_user, create_participant
 
 
-class TestFactories(TestCase):
-
-    def test_facotries(self):
-        party = create_party()
-        self.assertEqual(party.name, 'Party')
-        party = create_party('FUNFUNFUN')
-        self.assertEqual(party.name, 'FUNFUNFUN')
-
 class GiftExchangeTestCase(TestCase):
 
     def create_and_login_user(self):
@@ -28,7 +20,8 @@ class ExchangeTestCase(GiftExchangeTestCase):
     def setUp(self):
         self.create_and_login_user()
         self.party = Party.objects.create()
-        self.participant1 = Participant.objects.create(party=self.party, status=Participant.JOINED)
+        # self.participant1 = Participant.objects.create(party=self.party, status=Participant.JOINED)
+        self.participant1 = create_participant(party=self.party, status=Participant.JOINED)
         self.participant2 = Participant.objects.create(party=self.party, status=Participant.JOINED)
 
     def test_start_exchange(self):

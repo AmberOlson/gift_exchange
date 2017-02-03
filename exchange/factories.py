@@ -12,6 +12,6 @@ def create_user(name='Corbin', email='corbin@example.com', password='password'):
     return user
 
 
-def create_participant(party, user, admin=False, status=Participant.INVITED):
+def create_participant(party, user=None, admin=False, status=Participant.INVITED):
     participant = Participant.objects.create(party=party, user=user, admin=admin, status=status)
     return participant

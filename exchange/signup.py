@@ -1,5 +1,4 @@
-from django.contrib.auth import authenticate, login
-from exchange.models import Participant
+from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 
 

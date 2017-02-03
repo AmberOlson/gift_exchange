@@ -15,7 +15,11 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
-from exchange.views import PartyListView, PartyCreateView, PartyView, ParticipantCreateView, ExchangeView, SignUpView, PartyDelete, ParticipantEditView, SignUpInvitedView, LogOutView
+from exchange.views.exchanges import ExchangeView
+from exchange.views.signup import SignUpView, SignUpInvitedView, LogOutView
+from exchange.views.particapant import ParticipantCreateView, ParticipantEditView
+from exchange.views.party import PartyListView, PartyCreateView, PartyView, PartyDelete
+
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
